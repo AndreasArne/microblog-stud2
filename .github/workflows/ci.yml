@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    # Only branches. A tag push does not match, the CD workflow runs the tests itself.
+    branches:
+      - "**"
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+
+      - name: Install packages
+        run: make install-test
+
+      - name: Validate code, run unit and integration tests
+        run: make test
+
+      - name: Validate Dockerfiles
+        run: make validate-docker
