@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1.4
+FROM python:3.8-alpine
+
+# hadolint ignore=DL3018
+RUN <<-EOF
+    apk add --no-cache make
+    adduser -D -u 1000 microblog
+EOF
+
+WORKDIR /home/microblog
+
+COPY requirements requirements
+COPY Makefile pytest.ini .pylintrc .coveragerc test.sh ./
+
+RUN <<-EOF
+    python -m venv .venv
+    .venv/bin/pip3 install --no-cache-dir -r requirements/test.txt
+    chmod +x test.sh
+    chown -R microblog:microblog ./
+EOF
+
+ENV PATH="/home/microblog/.venv/bin:$PATH"
+
+USER 1000
+
+# app and tests are mounted as volumes, see docker-compose.yml
+ENTRYPOINT ["./test.sh"]
