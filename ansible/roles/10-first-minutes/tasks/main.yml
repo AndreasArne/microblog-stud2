@@ -60,7 +60,7 @@
         user: "{{ server_user }}"
         state: present
         key: "{{ lookup('file', item) }}"
-    with_items: "{{ pub_ssh_key_location }}"
+    with_fileglob: "{{ ssh_keys_dir }}/*.pub"
 
 
 -   name: Add user to sudoers

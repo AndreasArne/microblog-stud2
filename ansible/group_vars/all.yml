@@ -2,19 +2,21 @@
 # Here you can add variables that will be available for all hosts.
 ansible_python_interpreter: "python3"
 
-resource_group: <your resource group> # Change me
-domain_name: <your domain> # Change me
+resource_group: DIDA-AARSTUD-DV1673-H26-LP2
+domain_name: devops.arnesson.dev
 
-admin_email: <an email>
+admin_email: aar-test-student@devops.arnesson.dev
 
 # The VM size. Azure's policy for the course only allows some sizes, and a size can be out of capacity in a region.
 vm_size: Standard_B2ts_v2
 
 vmtags:
-    StudentId: <acronym> # Change me
+    StudentId: aarstud
 
 
-pub_ssh_key_location: '<path to you local ssh public key>' # Change me, your local ssh key!
+pub_ssh_key_location: '~/.ssh/run1352_a.pub'
+# One public key per group member, 10-first-minutes adds all of them to authorized_keys.
+ssh_keys_dir: "{{ playbook_dir }}/ssh_keys"
 
 
 # The user Azure creates on the VMs. 10-first-minutes removes it.
@@ -27,3 +29,13 @@ server_user_groups:
 # Let's Encrypt only gives 5 real certificates a week for the same domain. Use true while you build and test,
 # the certificate is then not trusted by browsers. Use false when everything works to get a real certificate.
 certbot_staging: true
+
+# The image deploy_app.yml starts. CD sends app_version, the version of the tag.
+app_image: "andreasarne/microblog"
+app_version: "11.0.0"
+app_pull: true
+
+# Throwaway test passwords. CD overrides them from GitHub secrets with -e.
+db_root_password: "run1352-root-pw"
+db_password: "run1352-db-pw"
+app_secret_key: "run1352-secret-key"
