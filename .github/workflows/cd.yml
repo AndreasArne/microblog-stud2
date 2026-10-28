@@ -66,7 +66,6 @@ jobs:
           ansible-playbook -i prod_hosts deploy_app.yml --private-key ~/.ssh/id_ed25519
           -e app_version=${{ needs.publish.outputs.version }}
           -e app_image=${{ secrets.DOCKERHUB_USERNAME }}/microblog
-          -e db_password="$DB_PASSWORD" -e app_secret_key="$APP_SECRET_KEY"
+          -e app_secret_key="$APP_SECRET_KEY"
         env:
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           APP_SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
