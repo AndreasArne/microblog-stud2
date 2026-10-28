@@ -49,7 +49,8 @@ class User(UserMixin, db.Model):
         """
         Return Gravatar URL based on email
         """
-        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        # Gravatar identifies the avatar by the MD5 of the email address, the hash is not used for security.
+        digest = md5(self.email.lower().encode('utf-8'), usedforsecurity=False).hexdigest()
         url = f'https://www.gravatar.com/avatar/{digest}?d=retro&s={size}'
         current_app.logger.debug(f"Get gravatar {url}")
         return url

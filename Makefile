@@ -105,6 +105,44 @@ validate-docker:
 
 
 
+# Versions of the security tools, pinned so everyone and GitHub Actions run the same tool.
+TRIVY_IMAGE  = aquasec/trivy:0.75.0
+DOCKLE_IMAGE = goodwithtech/dockle:v0.4.15
+# The production image to scan, override with: make trivy-image IMAGE=<name>
+IMAGE ?= microblog:prod
+
+
+
+# target: bandit                       - Run the SAST tool Bandit on the code in app/
+.PHONY: bandit
+bandit:
+	@bandit -r app
+
+
+
+# target: trivy-image                  - Scan the production image (IMAGE) with Trivy, build it first
+.PHONY: trivy-image
+trivy-image:
+	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(TRIVY_IMAGE) image \
+		--scanners vuln,secret,misconfig --no-progress --severity HIGH,CRITICAL --exit-code 1 $(IMAGE)
+
+
+
+# target: trivy-fs                     - Scan the repo folder with Trivy
+.PHONY: trivy-fs
+trivy-fs:
+	@docker run --rm -v "$$(pwd)":/repo -w /repo $(TRIVY_IMAGE) fs \
+		--scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 1 --no-progress --skip-dirs .venv,venv .
+
+
+
+# target: dockle                       - Lint the production image (IMAGE) with Dockle, build it first
+.PHONY: dockle
+dockle:
+	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(DOCKLE_IMAGE) --exit-code 1 $(IMAGE)
+
+
+
 # target: validate-ci                  - Validate CircleCi config with CircleCi CLI
 .PHONY: validate-ci
 validate-ci:
