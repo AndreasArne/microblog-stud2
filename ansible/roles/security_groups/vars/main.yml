@@ -34,7 +34,7 @@ sg_groups:
             access: Allow
             priority: 1004
             direction: Inbound
-            source_address_prefix: '0.0.0.0/0'
+            source_address_prefix: "{{ app_sources }}" # only the app servers use the database
     -   name: appserver
         port_rules:
         -   name: SSH
@@ -50,4 +50,4 @@ sg_groups:
             access: Allow
             priority: 1002
             direction: Inbound
-            source_address_prefix: '0.0.0.0/0'
+            source_address_prefix: "{{ lb_sources }}" # only the load balancer sends requests to the app
