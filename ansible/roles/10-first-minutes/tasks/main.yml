@@ -71,18 +71,14 @@
         state: present
         validate: '/usr/sbin/visudo -cf %s' # kan få fel med line "{{ server_user }} testing"
 
--   name: Disallow root and password ssh access
-    lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-        state: present
-        validate: '/usr/sbin/sshd -T -f %s' # kan få fel med line "PermitRootLogin testing"
-    with_items:
-        - regexp: "^PasswordAuthentication"
-          line: "PasswordAuthentication no"
-        - regexp: "^PermitRootLogin"
-          line: "PermitRootLogin no"
+-   name: Recommended SSH configuration (Mozilla Modern), no root and no password login
+    template:
+        src: sshd_config.j2
+        dest: /etc/ssh/sshd_config
+        owner: root
+        group: root
+        mode: "644"
+        validate: '/usr/sbin/sshd -t -f %s' # a broken file would lock us out, sshd -t refuses it before it is written
     notify: restart ssh
 
 -   name: flush handlers to restart SSH
@@ -94,6 +90,8 @@
         regexp: "^AllowUsers"
         line: "AllowUsers {{ server_user }}"
         state: present
+        validate: '/usr/sbin/sshd -t -f %s'
+    notify: restart ssh # runs at the end of the play, after azureuser is removed
     # ignore_errors: yes
 
 -   name: Remove default user

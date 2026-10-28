@@ -4,3 +4,5 @@ packages:
     -   tmux
     -   git
     -   unattended-upgrades
+# Where Ubuntu installs the sftp server, used in templates/sshd_config.j2
+sftp_server_path: /usr/lib/openssh/sftp-server

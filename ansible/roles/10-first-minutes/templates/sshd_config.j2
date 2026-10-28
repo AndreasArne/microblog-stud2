@@ -1,0 +1,32 @@
+# {{ ansible_managed }}
+# Mozilla's "Modern (OpenSSH 6.7+)" configuration, https://infosec.mozilla.org/guidelines/openssh
+# It replaces the whole /etc/ssh/sshd_config. AllowUsers is added at the end of the role, see tasks/main.yml.
+
+# Supported HostKey algorithms by order of preference.
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+HostKey /etc/ssh/ssh_host_ecdsa_key
+
+KexAlgorithms curve25519-sha256@libssh.org,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha256
+
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-512,hmac-sha2-256,umac-128@openssh.com
+
+# Password based logins are disabled - only public key based logins are allowed.
+AuthenticationMethods publickey
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+
+# LogLevel VERBOSE logs user's key fingerprint on login. Needed to have a clear audit track of which key was using to log in.
+LogLevel VERBOSE
+
+# Log sftp level file access (read/write/etc.) that would not be easily logged otherwise.
+# The path in Mozilla's guide is wrong for Ubuntu, there it is /usr/lib/openssh/sftp-server.
+Subsystem sftp  {{ sftp_server_path }} -f AUTHPRIV -l INFO
+
+# Root login is not allowed for auditing reasons.
+PermitRootLogin no
+
+# Ubuntu needs PAM for a real login session (environment, limits, systemd session).
+UsePAM yes
