@@ -14,10 +14,11 @@
             - "8000:5000"
 
 -   name: Check that the server runs the right version
+    # Asked on the app server itself. Port 8000 only accepts the load balancer (security group),
+    # so a request from our own computer or from GitHub Actions would never get an answer.
     uri:
-        url: "http://{{ inventory_hostname }}:8000/version"
+        url: "http://localhost:8000/version"
         return_content: true
-    delegate_to: localhost
     become: false
     register: running_version
     until: running_version.status | default(0) == 200 and running_version.content | trim == app_version
