@@ -1,0 +1,5 @@
+#!/bin/sh
+# Stops a commit if Gitleaks finds a secret in the staged changes.
+# Turn on with: git config core.hooksPath scripts/git-hooks
+# Skip once (only for a false-positive you have checked): git commit --no-verify
+exec make --no-print-directory gitleaks-staged

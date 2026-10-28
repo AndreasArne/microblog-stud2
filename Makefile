@@ -108,6 +108,7 @@ validate-docker:
 # Versions of the security tools, pinned so everyone and GitHub Actions run the same tool.
 TRIVY_IMAGE  = aquasec/trivy:0.75.0
 DOCKLE_IMAGE = goodwithtech/dockle:v0.4.15
+GITLEAKS_IMAGE = ghcr.io/gitleaks/gitleaks:v8.30.1
 # The production image to scan, override with: make trivy-image IMAGE=<name>
 IMAGE ?= microblog:prod
 
@@ -144,6 +145,20 @@ trivy-fs:
 dockle:
 	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(DOCKLE_IMAGE) --exit-code 1 \
 		--ignore DKL-DI-0004 $(IMAGE)
+
+
+
+# target: gitleaks                     - Search the whole git history for secrets with Gitleaks
+.PHONY: gitleaks
+gitleaks:
+	@docker run --rm -v "$$(pwd)":/repo -w /repo $(GITLEAKS_IMAGE) git --no-banner --redact -v .
+
+
+
+# target: gitleaks-staged              - Search the staged changes for secrets, used by the pre-commit hook
+.PHONY: gitleaks-staged
+gitleaks-staged:
+	@docker run --rm -v "$$(pwd)":/repo -w /repo $(GITLEAKS_IMAGE) git --no-banner --redact -v --staged .
 
 
 

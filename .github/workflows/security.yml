@@ -26,6 +26,16 @@ jobs:
       - name: Bandit on app/
         run: make bandit
 
+  gitleaks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the whole history, a secret that was removed later is still in it
+
+      - name: Gitleaks on the git history
+        run: make gitleaks
+
   trivy-fs:
     runs-on: ubuntu-24.04
     steps:
