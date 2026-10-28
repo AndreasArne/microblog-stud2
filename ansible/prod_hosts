@@ -1,0 +1,9 @@
+[appserver]
+appserver1.devops.arnesson.dev
+appserver2.devops.arnesson.dev
+
+[loadbalancer]
+devops.arnesson.dev
+
+[database]
+devops.arnesson.dev

@@ -1,0 +1,8 @@
+# MySQL in a container, on the host database (the load balancer VM, see roles/provision_instances/vars/main.yml)
+---
+-   hosts: database
+    remote_user: "{{ server_user }}"
+    become: true
+    roles:
+        -   docker
+        -   database

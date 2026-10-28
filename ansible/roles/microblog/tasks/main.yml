@@ -1,0 +1,34 @@
+---
+-   name: Microblog container
+    community.docker.docker_container:
+        name: microblog
+        image: "{{ app_image }}:{{ app_version }}"
+        state: started
+        pull: "{{ 'always' if app_pull | bool else 'never' }}"
+        recreate: true
+        restart_policy: unless-stopped
+        env:
+            SECRET_KEY: "{{ app_secret_key }}"
+            DATABASE_URL: "mysql+pymysql://microblog:{{ db_password }}@{{ domain_name }}/microblog"
+        ports:
+            - "8000:5000"
+
+-   name: Check that the server runs the right version
+    uri:
+        url: "http://{{ inventory_hostname }}:8000/version"
+        return_content: true
+    delegate_to: localhost
+    become: false
+    register: running_version
+    until: running_version.status | default(0) == 200 and running_version.content | trim == app_version
+    retries: 20
+    delay: 6
+    changed_when: false
+
+-   name: Wait for the load balancer to start using this server again before the next one is taken down
+    # nginx stops sending requests to a server that failed for 10 seconds (fail_timeout). Without this
+    # pause both servers can be marked as failed at the same time, and the site gives 502 for a while.
+    pause:
+        seconds: 12
+    delegate_to: localhost
+    become: false

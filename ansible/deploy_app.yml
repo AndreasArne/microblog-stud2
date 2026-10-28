@@ -1,0 +1,10 @@
+# Deploys the version app_version of Microblog, one app server at a time so there is always one that answers.
+# Run: ansible-playbook deploy_app.yml -e app_version=11.0.1
+---
+-   hosts: appserver
+    remote_user: "{{ server_user }}"
+    become: true
+    serial: 1
+    roles:
+        -   docker
+        -   microblog

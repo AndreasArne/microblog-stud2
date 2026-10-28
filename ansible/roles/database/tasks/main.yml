@@ -1,0 +1,28 @@
+---
+-   name: MySQL container, the data is in a volume and the container restarts after a stop/start of the VM
+    community.docker.docker_container:
+        name: mysql
+        image: mysql:5.7
+        state: started
+        restart_policy: unless-stopped
+        env:
+            MYSQL_ROOT_PASSWORD: "{{ db_root_password }}"
+            MYSQL_DATABASE: microblog
+            MYSQL_USER: microblog
+            MYSQL_PASSWORD: "{{ db_password }}"
+        # The load balancer VM has 1 GB of memory, MySQL 5.7 needs to be told to use less
+        command: "--performance-schema=off --innodb-buffer-pool-size=64M --max-connections=50"
+        volumes:
+            - mysql-data:/var/lib/mysql
+        ports:
+            - "3306:3306"
+    no_log: true
+
+-   name: Wait until the app user can log in
+    command: docker exec mysql mysql -umicroblog -p{{ db_password }} microblog -e "select 1"
+    register: mysql_login
+    until: mysql_login.rc == 0
+    retries: 40
+    delay: 10
+    changed_when: false
+    no_log: true
