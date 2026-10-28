@@ -91,7 +91,8 @@
         line: "AllowUsers {{ server_user }}"
         state: present
         validate: '/usr/sbin/sshd -t -f %s'
-    notify: restart ssh # runs at the end of the play, after azureuser is removed
+    register: allow_users
+    # No notify: the handler would run at the end of the play as azureuser, who is removed below.
     # ignore_errors: yes
 
 -   name: Remove default user
@@ -102,3 +103,10 @@
         force: yes
         remove: yes
     # ignore_errors: yes
+
+-   name: Restart ssh so that AllowUsers is used, as the new user since azureuser is gone
+    remote_user: "{{ server_user }}"
+    service:
+        name: ssh
+        state: restarted
+    when: allow_users is changed
