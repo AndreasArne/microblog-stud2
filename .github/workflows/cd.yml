@@ -12,6 +12,8 @@ jobs:
   publish:
     needs: test
     runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
 
@@ -34,3 +36,37 @@ jobs:
           build-args: |
             APP_VERSION=${{ steps.version.outputs.version }}
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/microblog:${{ steps.version.outputs.version }}
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements/deploy.txt
+
+      - name: Install Ansible
+        run: pip install -r requirements/deploy.txt
+
+      - name: Save the ssh key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy the new version, one server at a time, and check /version
+        working-directory: ansible
+        run: >
+          ansible-playbook -i prod_hosts deploy_app.yml --private-key ~/.ssh/id_ed25519
+          -e app_version=${{ needs.publish.outputs.version }}
+          -e app_image=${{ secrets.DOCKERHUB_USERNAME }}/microblog
+          -e db_password="$DB_PASSWORD" -e app_secret_key="$APP_SECRET_KEY"
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          APP_SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
