@@ -32,7 +32,7 @@ certbot_staging: true
 
 # The image deploy_app.yml starts. CD sends app_version, the version of the tag.
 app_image: "andreasarne/microblog"
-app_version: "11.0.0"
+app_version: "11.1.0"
 app_pull: true
 
 # Throwaway test passwords. CD overrides them from GitHub secrets with -e.
