@@ -2,7 +2,7 @@
 # Gitleaks found these the first time it ran (kmom03): the throwaway database and app passwords were
 # committed in ansible/group_vars/all.yml in kmom02. They are in the history and are public on GitHub,
 # ignoring them here does NOT make them secret again. The fix is to rotate them and send them from GitHub
-# secrets with -e (see tool/README.md). They are listed here so that the scan catches NEW leaks.
+# secrets with -e (see docs/gitleaks/README.md). They are listed here so that the scan catches NEW leaks.
 8a74371bf459d38076173c20daaf03d6ebc9b12d:ansible/group_vars/all.yml:generic-api-key:39
 8a74371bf459d38076173c20daaf03d6ebc9b12d:ansible/group_vars/all.yml:generic-api-key:40
 8a74371bf459d38076173c20daaf03d6ebc9b12d:ansible/group_vars/all.yml:generic-api-key:41

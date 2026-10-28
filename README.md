@@ -117,3 +117,7 @@ This is a co-effort of several people using freely available documentation and t
 For contributors, see commit history and issues.
 
 Feel free to help building up the repository with more content suited for training and education.
+
+## Technical study
+
+[Gitleaks in Microblog](docs/gitleaks/README.md), the optional tool in kmom03.
