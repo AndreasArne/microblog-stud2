@@ -132,14 +132,18 @@ trivy-image:
 .PHONY: trivy-fs
 trivy-fs:
 	@docker run --rm -v "$$(pwd)":/repo -w /repo $(TRIVY_IMAGE) fs \
-		--scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 1 --no-progress --skip-dirs .venv,venv .
+		--scanners vuln,secret,misconfig --severity HIGH,CRITICAL --exit-code 1 --no-progress --skip-dirs .venv,venv \
+		--ignorefile .trivyignore.yaml .
 
 
 
 # target: dockle                       - Lint the production image (IMAGE) with Dockle, build it first
 .PHONY: dockle
+# DKL-DI-0004 (apk add without --no-cache) is ignored. It is a false-positive: Dockle reports a layer from the
+# python base image, whose RUN uses apk add --no-cache --virtual. Our own Dockerfile_prod does not run apk.
 dockle:
-	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(DOCKLE_IMAGE) --exit-code 1 $(IMAGE)
+	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock $(DOCKLE_IMAGE) --exit-code 1 \
+		--ignore DKL-DI-0004 $(IMAGE)
 
 
 

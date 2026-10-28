@@ -1,0 +1,10 @@
+# Findings Trivy should ignore, each with the reason.
+misconfigurations:
+  - id: DS-0002
+    paths:
+      - ".devcontainer/Dockerfile"
+    # The dev container starts as root but VS Code runs as the user dev (remoteUser in
+    # .devcontainer/devcontainer.json). A USER line in the Dockerfile would take away the
+    # Docker access the docker-outside-of-docker feature sets up. Only for the dev container,
+    # the production Dockerfile has a USER.
+    statement: The dev container runs as the non-root user dev through remoteUser
