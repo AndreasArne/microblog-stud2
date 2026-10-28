@@ -9,8 +9,11 @@ jobs:
   test:
     uses: ./.github/workflows/ci.yml
 
+  security:
+    uses: ./.github/workflows/security.yml
+
   publish:
-    needs: test
+    needs: [test, security]
     runs-on: ubuntu-24.04
     outputs:
       version: ${{ steps.version.outputs.version }}

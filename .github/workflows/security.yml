@@ -1,0 +1,49 @@
+name: Security
+
+# Bandit (SAST), Trivy (vulnerabilities, secrets, misconfigurations) and Dockle (image lint).
+# Runs on every push and is called by the CD workflow, which only publishes if this passes.
+on:
+  push:
+    branches:
+      - "**"
+  workflow_call:
+
+jobs:
+  bandit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+
+      - name: Install packages
+        run: make install-test
+
+      - name: Bandit on app/
+        run: make bandit
+
+  trivy-fs:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Trivy on the repo folder
+        run: make trivy-fs
+
+  image:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the production image
+        run: docker build -f docker/Dockerfile_prod -t microblog:prod .
+
+      - name: Trivy on the production image
+        run: make trivy-image IMAGE=microblog:prod
+
+      - name: Dockle on the production image
+        run: make dockle IMAGE=microblog:prod
