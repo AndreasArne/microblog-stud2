@@ -11,3 +11,21 @@ groups:
           severity: critical
         annotations:
           summary: "Microblog answered with a 5xx status"
+
+      # Fires when Prometheus cannot scrape the app, the app is down.
+      - alert: MicroblogDown
+        expr: up{job="microblog"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Prometheus cannot scrape Microblog"
+
+      # Fires when the slowest 5 % of requests take more than 1 second.
+      - alert: MicroblogSlowResponses
+        expr: histogram_quantile(0.95, sum by (le) (rate(flask_http_request_duration_seconds_bucket[5m]))) > 1
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "95th percentile response time for Microblog is above 1 s"

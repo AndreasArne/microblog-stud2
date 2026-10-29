@@ -95,3 +95,14 @@ def version():
     Route that shows which version of the app that is running
     """
     return current_app.config["APP_VERSION"]
+
+
+
+@bp.route('/crash')
+def crash():
+    """
+    Route that always fails, used to test monitoring and alerting (kmom04).
+    Gives a 500 through the error handler in app/errors.
+    """
+    current_app.logger.error("The /crash route was called, raising an error")
+    raise RuntimeError("Intentional error from /crash, for testing monitoring")

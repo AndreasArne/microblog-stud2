@@ -1,6 +1,7 @@
 """
 Contains error handlers
 """
+from datetime import datetime, timezone
 from flask import render_template, current_app
 from app import db
 from app.errors import bp
@@ -22,4 +23,5 @@ def internal_error(error):
     """
     current_app.logger.info(error)
     db.session.rollback()
-    return render_template('errors/500.html'), 500
+    now = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
+    return render_template('errors/500.html', now=now), 500

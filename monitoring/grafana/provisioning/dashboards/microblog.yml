@@ -1,0 +1,9 @@
+# Loads the dashboards in ./json when Grafana starts,
+# so the dashboard is in git and not only in the grafana-data volume.
+apiVersion: 1
+providers:
+  - name: microblog
+    type: file
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/json
