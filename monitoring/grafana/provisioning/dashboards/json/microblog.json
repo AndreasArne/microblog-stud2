@@ -2,7 +2,7 @@
   "uid": "microblog-errors",
   "title": "Microblog errors",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "5s",
   "time": {
     "from": "now-30m",
@@ -28,7 +28,9 @@
         {
           "refId": "A",
           "expr": "(sum(flask_http_request_total{status=~\"5..\"}) or vector(0)) - (sum(flask_http_request_total{status=~\"5..\"} offset 1m) or vector(0))",
-          "legendFormat": "5xx"
+          "legendFormat": "5xx",
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -75,7 +77,9 @@
         {
           "refId": "A",
           "expr": "up{job=\"microblog\"}",
-          "legendFormat": "up"
+          "legendFormat": "up",
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
