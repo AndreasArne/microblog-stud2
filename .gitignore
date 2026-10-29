@@ -109,3 +109,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Real Kubernetes secrets, keep only the example file in git
+kubernetes/**/mysql-secrets.yml

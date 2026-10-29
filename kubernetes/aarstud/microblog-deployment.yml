@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microblog
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: microblog
+  template:
+    metadata:
+      labels:
+        app: microblog
+    spec:
+      # Trivy (the Security workflow from kmom03) fails on HIGH KSV-0014/KSV-0118 without these.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: microblog
+        image: andreasarne/microblog:11.1.0
+        ports:
+        - containerPort: 5000
+        env:
+        # Dependent env var: DB_PASSWORD must be defined before DATABASE_URL uses $(DB_PASSWORD).
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secrets
+              key: DB_PASSWORD
+        - name: DATABASE_URL
+          value: mysql+pymysql://microblog:$(DB_PASSWORD)@mysql/microblog
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: microblog-secrets
+              key: SECRET_KEY
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        # boot.sh runs the migrations before gunicorn listens, give it time before liveness counts.
+        startupProbe:
+          httpGet:
+            path: /version
+            port: 5000
+          periodSeconds: 5
+          failureThreshold: 60
+        readinessProbe:
+          httpGet:
+            path: /version
+            port: 5000
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+      volumes:
+      - name: tmp
+        emptyDir: {}
