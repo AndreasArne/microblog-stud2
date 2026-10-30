@@ -4,7 +4,7 @@
         name: "{{ app_container_name }}"
         image: "{{ dockerhub_username }}/microblog:{{ app_version }}"
         state: started
-        pull: true
+        pull: "{{ 'always' if app_pull | bool else 'never' }}"
         recreate: true
         restart_policy: unless-stopped
         published_ports:
