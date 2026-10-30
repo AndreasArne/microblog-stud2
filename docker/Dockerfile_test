@@ -1,0 +1,18 @@
+FROM python:3.8-alpine
+
+# Do not write __pycache__ into the mounted volumes, root would own the files
+ENV PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /app
+
+COPY requirements requirements
+# Alpine packages are not pinned, the version changes with the Alpine release
+# hadolint ignore=DL3018
+RUN apk add --no-cache make \
+    && pip install --no-cache-dir -r requirements/test.txt
+
+COPY Makefile pytest.ini .pylintrc .coveragerc microblog.py ./
+COPY docker/test.sh ./test.sh
+
+# app and tests are mounted as volumes, see docker-compose.yml
+ENTRYPOINT ["./test.sh"]
