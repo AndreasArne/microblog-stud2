@@ -1,0 +1,15 @@
+---
+-   name: Install Docker and the Python package the docker modules need
+    apt:
+        name:
+            - docker.io
+            - python3-docker
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+-   name: Make sure Docker is running and starts at boot
+    service:
+        name: docker
+        state: started
+        enabled: true

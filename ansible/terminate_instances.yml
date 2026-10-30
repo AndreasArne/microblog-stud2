@@ -50,7 +50,7 @@
                 zone_name: "{{ domain_name }}"
                 record_type: A
                 state: absent
-            loop: "{{ relative_names }}"
+            loop: "{{ relative_names + (instances | selectattr('type', 'equalto', 'appserver') | list) }}"
             loop_control:
                 label: "{{ item.name }}"
 

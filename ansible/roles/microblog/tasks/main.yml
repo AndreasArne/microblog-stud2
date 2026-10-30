@@ -1,0 +1,26 @@
+---
+-   name: Run the Microblog container {{ dockerhub_username }}/microblog:{{ app_version }}
+    community.docker.docker_container:
+        name: "{{ app_container_name }}"
+        image: "{{ dockerhub_username }}/microblog:{{ app_version }}"
+        state: started
+        pull: true
+        recreate: true
+        restart_policy: unless-stopped
+        published_ports:
+            - "8000:5000"
+        env:
+            SECRET_KEY: "{{ app_secret_key }}"
+            DATABASE_URL: "mysql+pymysql://microblog:{{ db_password }}@{{ domain_name }}:3306/microblog"
+    no_log: true
+
+-   name: Wait until the app answers with the right version
+    uri:
+        url: "http://{{ inventory_hostname }}:8000/version"
+        return_content: true
+    delegate_to: localhost
+    become: false
+    register: app_version_check
+    until: app_version_check.status == 200 and app_version_check.content | trim == app_version
+    retries: 30
+    delay: 5

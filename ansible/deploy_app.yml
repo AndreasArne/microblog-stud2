@@ -1,0 +1,12 @@
+---
+# Rolling deployment, one app server at a time. While one is updated the load balancer sends requests to the other.
+# Needs: -e app_version=<version> -e dockerhub_username=<name> -e db_password=<pw> -e app_secret_key=<key>
+-   name: Microblog
+    hosts: appserver
+    serial: 1
+    tags: app
+    remote_user: "{{ server_user }}"
+    become: true
+    roles:
+        -   docker
+        -   microblog

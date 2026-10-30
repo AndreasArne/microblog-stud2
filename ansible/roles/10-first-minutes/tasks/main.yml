@@ -60,7 +60,7 @@
         user: "{{ server_user }}"
         state: present
         key: "{{ lookup('file', item) }}"
-    with_items: "{{ pub_ssh_key_location }}"
+    loop: "{{ lookup('ansible.builtin.fileglob', playbook_dir ~ '/' ~ pub_ssh_keys_dir ~ '/*.pub', wantlist=True) }}"
 
 
 -   name: Add user to sudoers

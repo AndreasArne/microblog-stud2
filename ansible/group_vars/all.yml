@@ -4,19 +4,21 @@ ansible_python_interpreter: "python3"
 
 # Where the VMs, network and IP addresses are created. Must be a location that your resource group and the school's policy allow.
 region: northeurope
-resource_group: <your resource group> # Change me
-domain_name: <your domain> # Change me
+resource_group: DIDA-AARSTUD-DV1673-H26-LP2
+domain_name: devops.arnesson.dev
 
-admin_email: <an email>
+admin_email: devops-test@arnesson.dev
 
 # The VM size. Azure's policy for the course only allows some sizes, and a size can be out of capacity in a region.
 vm_size: Standard_B2ts_v2
 
 vmtags:
-    StudentId: <acronym> # Change me
+    StudentId: aarrun1030
 
 
-pub_ssh_key_location: '<path to you local ssh public key>' # Change me, your local ssh key!
+pub_ssh_key_location: '/home/dev/.ssh/run20261030_a.pub'
+# One public key file per group member, read by 10-first-minutes.
+pub_ssh_keys_dir: 'public_keys'
 
 
 # The user Azure creates on the VMs. 10-first-minutes removes it.
