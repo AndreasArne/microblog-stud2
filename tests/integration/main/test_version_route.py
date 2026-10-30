@@ -29,7 +29,7 @@ def test_version_default(monkeypatch):
     client = create_client(monkeypatch, None)
     response = client.get("/version")
     assert response.status_code == 200
-    assert response.data == b"unknown"
+    assert response.data == b"wrong"
     monkeypatch.undo()
     importlib.reload(config)
 
