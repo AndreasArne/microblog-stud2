@@ -1,0 +1,4 @@
+---
+app_container_name: microblog
+# false when the image was loaded on the server by hand, for testing
+app_pull: true

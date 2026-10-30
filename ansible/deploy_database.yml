@@ -1,0 +1,8 @@
+---
+-   name: Database
+    hosts: database
+    remote_user: "{{ server_user }}"
+    become: true
+    roles:
+        -   docker
+        -   database

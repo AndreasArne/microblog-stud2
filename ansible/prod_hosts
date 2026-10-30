@@ -1,0 +1,11 @@
+# Inventory for the CD workflow. The servers are found through their domain names, no gather_instances.
+[appserver]
+appserver1.devops.arnesson.dev
+appserver2.devops.arnesson.dev
+
+[loadbalancer]
+devops.arnesson.dev
+
+# The database runs on the load balancer VM
+[database]
+devops.arnesson.dev

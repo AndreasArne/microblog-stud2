@@ -44,6 +44,15 @@ def index():
 
 
 
+@bp.route('/version')
+def version():
+    """
+    Route that shows which version of the app is running
+    """
+    return current_app.config["APP_VERSION"]
+
+
+
 @bp.route('/explore')
 @login_required
 def explore():

@@ -45,6 +45,21 @@
 
 
 
+-   name: Ensure "A" record for the app server, appserver1.<domain> and appserver2.<domain>
+    azure_rm_dnsrecordset:
+        resource_group: "{{ resource_group }}"
+        relative_name: "{{ iname }}"
+        zone_name: "{{ domain_name }}"
+        record_type: A
+        state: present
+        time_to_live: 60
+        records:
+            - entry: "{{ output_ip_address.state.ip_address }}"
+    when: itype == 'appserver'
+    delegate_to: 127.0.0.1
+
+
+
 -   name: Create VM
     azure_rm_virtualmachine:
         resource_group: "{{ resource_group }}"
