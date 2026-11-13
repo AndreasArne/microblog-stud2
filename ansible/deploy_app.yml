@@ -1,0 +1,30 @@
+---
+-   name: Save the image to a file
+    hosts: local
+    gather_facts: False
+    tasks:
+        -   name: docker save
+            command: docker save microblog:prod -o /tmp/microblog-image.tar
+            changed_when: true
+
+-   hosts: appserver
+    remote_user: "{{ server_user }}"
+    become: yes
+    serial: 1 # one server at a time, the others keep serving
+    vars:
+        microblog_image: "microblog:prod"
+        app_version: "11.0.0"
+    roles:
+        -   docker
+        -   microblog
+    post_tasks:
+        -   name: Check that the right version runs
+            uri:
+                url: "http://{{ inventory_hostname }}:8000/version"
+                return_content: yes
+            register: version_check
+            until: version_check.status == 200 and version_check.content == app_version
+            retries: 12
+            delay: 5
+            delegate_to: localhost
+            become: false
