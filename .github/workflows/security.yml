@@ -1,0 +1,27 @@
+name: Security
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_call:
+
+jobs:
+  security:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: make install-test
+      - name: Bandit
+        run: make bandit
+      - name: Build the prod image
+        run: docker compose build prod
+      - name: Trivy image
+        run: make trivy-image
+      - name: Trivy fs
+        run: make trivy-fs
+      - name: Dockle
+        run: make dockle

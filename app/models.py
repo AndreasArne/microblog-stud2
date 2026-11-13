@@ -37,7 +37,7 @@ class User(UserMixin, db.Model):
         """
         Set password to generated password hash
         """
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password, method="pbkdf2:sha256")
 
     def check_password(self, password):
         """
@@ -58,7 +58,8 @@ class User(UserMixin, db.Model):
         """
         Return Gravatar URL based on email
         """
-        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        # Gravatar identifies avatars by the MD5 of the email, it is not used for security. Bandit B324.
+        digest = md5(self.email.lower().encode('utf-8'), usedforsecurity=False).hexdigest()
         url = f'https://www.gravatar.com/avatar/{digest}?d=retro&s={size}'
         current_app.logger.debug(f"Get gravatar {url}")
         return url

@@ -1,0 +1,7 @@
+# The dev container starts as root and runs as the user dev (remoteUser in devcontainer.json).
+# A USER line would remove our access to Docker. Not a production image, so the finding is ignored for this file only.
+misconfigurations:
+  - id: DS-0002
+    paths:
+      - ".devcontainer/Dockerfile"
+    statement: "Dev container, runs as the user dev through remoteUser."
