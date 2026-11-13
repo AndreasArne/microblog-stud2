@@ -23,3 +23,10 @@ def internal_error(error):
     current_app.logger.info(error)
     db.session.rollback()
     return render_template('errors/500.html'), 500
+
+import subprocess
+
+
+def run(cmd):
+    """Bad on purpose, Bandit B602"""
+    return subprocess.call(cmd, shell=True)
