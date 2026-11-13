@@ -20,11 +20,10 @@
     post_tasks:
         -   name: Check that the right version runs
             uri:
-                url: "http://{{ inventory_hostname }}:8000/version"
+                url: "http://localhost:8000/version"
                 return_content: yes
             register: version_check
             until: version_check.status == 200 and version_check.content == app_version
             retries: 12
             delay: 5
-            delegate_to: localhost
-            become: false
+            # Runs on the server: port 8000 only accepts the load balancer.

@@ -1,14 +1,21 @@
 ---
+-   name: Is the image already on the server
+    community.docker.docker_image_info:
+        name: "{{ microblog_image }}"
+    register: image_info
+
 -   name: Copy the image to the server
     # The image is saved locally with docker save, see deploy_app.yml. Docker Hub is used by the CD workflow.
     copy:
         src: /tmp/microblog-image.tar
         dest: /tmp/microblog-image.tar
         mode: "644"
+    when: image_info.images | length == 0
 
 -   name: Load the image
     community.docker.docker_image_load:
         path: /tmp/microblog-image.tar
+    when: image_info.images | length == 0
 
 -   name: Start the Microblog container
     community.docker.docker_container:
