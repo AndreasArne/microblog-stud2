@@ -1,0 +1,18 @@
+# syntax=docker/dockerfile:1.4
+FROM python:3.8-alpine
+ENV PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /home/microblog
+
+COPY requirements requirements
+COPY requirements.txt Makefile pytest.ini .pylintrc .coveragerc microblog.py ./
+COPY docker/test.sh test.sh
+
+# hadolint ignore=DL3018
+RUN <<EOF
+    apk --no-cache add make build-base libffi-dev openssl-dev
+    pip install --no-cache-dir -r requirements/test.txt
+    chmod +x test.sh
+EOF
+
+ENTRYPOINT ["./test.sh"]
