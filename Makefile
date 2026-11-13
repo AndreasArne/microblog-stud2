@@ -105,7 +105,35 @@ validate-docker:
 
 
 
-# target: validate-ci                  - Validate CircleCi config with CircleCi CLI
+# target: bandit                       - Run Bandit (SAST) on app/
+.PHONY: bandit
+bandit:
+	@bandit -q -r app
+
+
+
+# target: trivy-image                  - Scan the prod image with Trivy (build it first: docker compose build prod)
+.PHONY: trivy-image
+trivy-image:
+	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.75.0 image --scanners vuln,secret,misconfig --no-progress --severity HIGH,CRITICAL --exit-code 1 microblog:prod
+
+
+
+# target: trivy-fs                     - Scan the repo with Trivy
+.PHONY: trivy-fs
+trivy-fs:
+	@docker run --rm -v "$(CURDIR)":/repo -w /repo aquasec/trivy:0.75.0 fs --scanners vuln,secret,misconfig --ignorefile .trivyignore.yaml --severity HIGH,CRITICAL --exit-code 1 --no-progress --skip-dirs .venv,venv,kubernetes .
+
+
+
+# target: dockle                       - Lint the prod image with Dockle. DKL-DI-0004 is a false positive, the layer comes from the python base image.
+.PHONY: dockle
+dockle:
+	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock goodwithtech/dockle:v0.4.15 --exit-code 1 --ignore DKL-DI-0004 microblog:prod
+
+
+
+# target: validate-ci                 - Validate CircleCi config with CircleCi CLI
 .PHONY: validate-ci
 validate-ci:
 	@circleci config validate
